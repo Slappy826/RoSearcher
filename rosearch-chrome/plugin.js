@@ -32,13 +32,13 @@ function onNewInput(input){
                     displayServer(server);
                 } else {
                     console.log(`%c[Server Searcher] Couldn't find user`,"color: #424242; font-size:16px;");
-                    addonError('could not find user in server');
+                    addonError('Could not find user in server!');
                 }
             });
         } else {
             isLoading = false;
             console.log(`%c[Server Searcher] Couldn't get user avatar`,"color: #424242; font-size:16px;");
-            addonError('could not find user');
+            addonError('Could not find user!');
         }
     });
 }
@@ -50,7 +50,7 @@ function displayServer(server){
     clearAddonServerContainer();
 
     var container = document.getElementById('rbx-addon-server-search');
-    if(container === null) throw 'could not find rbx-addon-search container';
+    if(container === null) throw 'Could not find rbx-addon-search container!';
 
     // creating elements
     var li = document.createElement('li');
@@ -117,14 +117,14 @@ function getAvatar(userId, callback){
         .catch(exc => {
             console.error(exc);
             isLoading = false;
-            addonError('error occured during callback');
+            addonError('Error occured during callback!');
         });
 }
 
 function getPlaceId() {
     //ghetto way of doin it lol
     var playButton = document.getElementById('MultiplayerVisitButton');
-    if(playButton === null) return addonError('unable to get placeid');
+    if(playButton === null) return addonError('Unable to get place ID!');
 
     return playButton.getAttribute('placeid');
 }
@@ -135,7 +135,7 @@ function findServer(avatar, userId, callback, startIndex = 0) {
     const placeId = getPlaceId();
     fetch(`https://www.roblox.com/games/getgameinstancesjson?placeId=${placeId}&startIndex=${startIndex}`)
         .then(r => {
-            if(!r.ok) throw 'invalid response';
+            if(!r.ok) throw 'Invalid response!';
             return r.json()
         })
         .then(r => {
@@ -162,7 +162,7 @@ function findServer(avatar, userId, callback, startIndex = 0) {
         .catch(ex => {
             console.error(exc);
             isLoading = false;
-            addonError('error occured during callback');
+            addonError('Error occured during callback!');
         });
 }
 
@@ -193,7 +193,7 @@ function addonError(err){
 
 function loadingAddonServerContainer(i){
     var thing = document.getElementById('rbx-addon-server-search');
-    if(thing === null) throw 'could not find addon server container';
+    if(thing === null) throw 'Could not find addon server container!';
 
     var loading = document.getElementById('rbx-addon-loading');
     if(loading !== null)
@@ -234,7 +234,7 @@ function displayAddonServerContainer(i){
 
 function addonGameServerContainerHasItems(i){
     var thing = document.getElementById('rbx-addon-server-search');
-    if(thing === null) throw 'could not find server container';
+    if(thing === null) throw 'Could not find server container!';
 
     if(i === true){
         thing.className = 'section rbx-game-server-item-container stack-list';
@@ -245,7 +245,7 @@ function addonGameServerContainerHasItems(i){
 
 function createGameServerContainer(){
     var rbxSrvCont = document.getElementById('rbx-game-server-item-container');
-    if(rbxSrvCont === null) throw 'could not find server container';
+    if(rbxSrvCont === null) throw 'Could not find server container!';
 
     var newNode = rbxSrvCont.cloneNode(false);
     newNode.id = "rbx-addon-server-search"
