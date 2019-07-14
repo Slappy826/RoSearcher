@@ -1,25 +1,25 @@
-// constants
-const TEXT_TIMEOUT = 500;
 
-// blah
-var runningGames = document.getElementById("rbx-running-games");
-var currentInput = "";
-var isLoading = false;
+let runningGames = document.getElementById("rbx-running-games");
+let currentInput = "";
+let isLoading = false;
 Roblox = window.Roblox;
 
-function onNewInput(input){
-    if(input.trim() === '')
-        return displayAddonServerContainer(false);
-    else
-        displayAddonServerContainer(true);
+function getCurrentUser() {
+    let element = document.getElementsByName("user-data")[0];
+    if (element) {
+        return [element.getAttribute("data-userid"), element.getAttribute("data-name").toLowerCase()];
+    }
 
+    return [];
+}
+
+function onSubmit(input, isUsername) {
     addonError(null);
-    clearAddonServerContainer();
     addonGameServerContainerHasItems(false);
+    clearAddonServerContainer();
     loadingAddonServerContainer(true);
 
-    isLoading = true;
-    getAvatar(input, (r) => {
+    let cb = (r) => {
         if(r.ok) {
             console.log(`%c[Server Searcher] User avatar ${r.url}`,"color: #424242; font-size:16px;");
             findServer(r.url, input, (success, server) => {
@@ -29,15 +29,53 @@ function onNewInput(input){
                     displayServer(server);
                 } else {
                     console.log(`%c[Server Searcher] Couldn't find user`,"color: #424242; font-size:16px;");
-                    addonError('could not find user in server');
+                    addonError('Could not find user in server!');
                 }
             });
         } else {
             isLoading = false;
             console.log(`%c[Server Searcher] Couldn't get user avatar`,"color: #424242; font-size:16px;");
-            addonError('could not find user');
+            addonError('Could not find user!');
         }
-    });
+    }
+
+    isLoading = true;
+
+    if (isUsername) {
+        getUserIdFromName(input).then(id => {
+            getAvatar(id, cb);
+        }).catch(e => {
+            isLoading = false;
+            addonError('Error occured while fetching avatar');
+        });
+    } else {
+        getAvatar(input, cb);
+    }
+}
+
+function onNewInput(input){
+    clearAddonServerContainer();
+
+    let idbutton = document.getElementsByClassName("idsubmit")[0];
+    let namebutton = document.getElementsByClassName("namesubmit")[0];
+
+    if(input.trim() === '') {
+        if (idbutton) idbutton.disabled = true;
+        if (namebutton) namebutton.disabled = true;
+
+        return displayAddonServerContainer(false);
+    }
+    else
+        displayAddonServerContainer(true);
+    
+
+    if (namebutton) namebutton.disabled = false;
+    if (!idbutton) return;
+
+    if (!Number(input))
+        idbutton.disabled = true;
+    else
+        idbutton.disabled = false;
 }
 
 function displayServer(server){
@@ -47,7 +85,7 @@ function displayServer(server){
     clearAddonServerContainer();
 
     var container = document.getElementById('rbx-addon-server-search');
-    if(container === null) throw 'could not find rbx-addon-search container';
+    if(container === null) throw 'Could not find rbx-addon-search container!';
 
     // creating elements
     var li = document.createElement('li');
@@ -103,36 +141,59 @@ function displayServer(server){
     container.appendChild(li);
 }
 
+function getUserIdFromName(name){
+	return new Promise((res, rej)=>{
+		fetch(`https://roblox.com/user.aspx?username=${name}`)
+			.then(r => {
+				if(!r.ok) throw 'Invalid response';
+				return r.url.match(/\d+/)[0];
+			})
+			.then(id => {
+                let data = getCurrentUser();
+                if (name.toLowerCase() != data[1] && id.toString() == data[0]){
+                    isLoading = false;
+                    addonError('Error occured while fetching username: username does not exist');
+                } else {
+                    res(id);
+                }
+			}).catch(e => {
+				console.error(e);
+				isLoading = false;
+				addonError('Error occured while fetching username!');
+			})
+	});
+}
+
 function getAvatar(userId, callback){
     if(!isLoading) return;
 
     fetch(`https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=48&height=48&format=png`)
         .then((v) => {
             if(isLoading)
-                callback(v);
+				callback(v, userId);
         })
         .catch(exc => {
             console.error(exc);
             isLoading = false;
-            addonError('error occured during callback');
+            addonError('Error occured during callback!');
         });
 }
 
 function getPlaceId() {
     //ghetto way of doin it lol
     var playButton = document.getElementById('MultiplayerVisitButton');
-    if(playButton === null) return addonError('unable to get placeid');
+    if(playButton === null) return addonError('Unable to get place ID!');
 
     return playButton.getAttribute('placeid');
 }
 
 function findServer(avatar, userId, callback, startIndex = 0) {
     if(!isLoading) return;
-    
+
     const placeId = getPlaceId();
     fetch(`https://www.roblox.com/games/getgameinstancesjson?placeId=${placeId}&startIndex=${startIndex}`)
         .then(r => {
-            if(!r.ok) throw 'invalid response';
+            if(!r.ok) throw 'Invalid response!';
             return r.json()
         })
         .then(r => {
@@ -145,8 +206,7 @@ function findServer(avatar, userId, callback, startIndex = 0) {
                         var idx, cnt;
                         for(idx = 0, cnt = item['CurrentPlayers'].length; idx < cnt; ++idx) {
                             var player = item['CurrentPlayers'][idx];
-                            if(typeof player['Thumbnail'] === 'object' && player['Thumbnail']['Url'] === avatar
-                                && isLoading){
+                            if(typeof player['Thumbnail'] === 'object' && player['Thumbnail']['Url'] === avatar && isLoading){
                                 return callback(true, item);
                             }
                         }
@@ -154,12 +214,13 @@ function findServer(avatar, userId, callback, startIndex = 0) {
                 }
                 return findServer(avatar, userId, callback, startIndex + count);
             }
+			
             callback(false, null);
         })
         .catch(ex => {
             console.error(exc);
             isLoading = false;
-            addonError('error occured during callback');
+            addonError('Error occured during callback!');
         });
 }
 
@@ -190,7 +251,7 @@ function addonError(err){
 
 function loadingAddonServerContainer(i){
     var thing = document.getElementById('rbx-addon-server-search');
-    if(thing === null) throw 'could not find addon server container';
+    if(thing === null) throw 'Could not find addon server container!';
 
     var loading = document.getElementById('rbx-addon-loading');
     if(loading !== null)
@@ -231,7 +292,7 @@ function displayAddonServerContainer(i){
 
 function addonGameServerContainerHasItems(i){
     var thing = document.getElementById('rbx-addon-server-search');
-    if(thing === null) throw 'could not find server container';
+    if(thing === null) throw 'Could not find server container!';
 
     if(i === true){
         thing.className = 'section rbx-game-server-item-container stack-list';
@@ -242,7 +303,7 @@ function addonGameServerContainerHasItems(i){
 
 function createGameServerContainer(){
     var rbxSrvCont = document.getElementById('rbx-game-server-item-container');
-    if(rbxSrvCont === null) throw 'could not find server container';
+    if(rbxSrvCont === null) throw 'Could not find server container!';
 
     var newNode = rbxSrvCont.cloneNode(false);
     newNode.id = "rbx-addon-server-search"
@@ -255,45 +316,50 @@ function createGameServerContainer(){
 function createInput(node){
     var container = document.createElement('div');
     var input = document.createElement('input');
-    input.className = "addMainInput";
-    input.placeholder = "User Id";
-    container.className = "addInputContainer";
+    var namebutton = document.createElement("button");
     
-    setInputFilter(input, function(value) {
-        return /^\d*$/.test(value);
-    });
+    input.className = "addMainInput";
+    input.placeholder = "Username / User ID";
+    container.className = "addInputContainer";
+    namebutton.className = "btn-secondary-md namesubmit";
+    namebutton.type = "submit";
+    namebutton.innerHTML = "Username";
+    namebutton.style["margin-left"] = "10px";
+	namebutton.style.height = "27px";
+	namebutton.style.padding = "3px";
+    namebutton.disabled = true;
 
-    var timeout = null;
+    var idbutton = namebutton.cloneNode();
+    idbutton.innerHTML = "UserId";
+    idbutton.className = "btn-secondary-md idsubmit"
+
     input.addEventListener('keyup', (e) => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
+        if (e.which !== 13) {
             onNewInput(input.value);
-        }, TEXT_TIMEOUT);
+        }
+    });
+    input.addEventListener('keydown', (e) => {
+        if (e.which == 13 && input.value.trim() !== "") {
+            onSubmit(input.value, true);
+        }
+    });
+	
+    namebutton.addEventListener("click", () => {
+        onSubmit(input.value, true);
+    });
+    idbutton.addEventListener("click", () => {
+        onSubmit(input.value, false);
     });
 
     container.appendChild(input);
+    container.appendChild(namebutton);
+    container.appendChild(idbutton);
     node.appendChild(container);
 }
 
-// credit: https://stackoverflow.com/questions/469357/html-text-input-allows-only-numeric-input
-function setInputFilter(textbox, inputFilter) {
-    ["input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop"].forEach(function(event) {
-      textbox.addEventListener(event, function() {
-        if (inputFilter(this.value)) {
-          this.oldValue = this.value;
-          this.oldSelectionStart = this.selectionStart;
-          this.oldSelectionEnd = this.selectionEnd;
-        } else if (this.hasOwnProperty("oldValue")) {
-          this.value = this.oldValue;
-          this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
-        }
-      });
-    });
-  }
 
 
 if(runningGames !== null) {
-    console.log(window.origin);
     console.log("%cServer Searcher has LOADED!","color: #424242; font-size:16px;");
     createInput(runningGames.firstChild);
 }
