@@ -17,7 +17,7 @@ It works by searching every single game server for avatar (it matches the cache'
 - [X] Finish initial extension
 - [X] Port the extension over to firefox
 - [ ] Fix the extension to work with all users ("bacon hair'd" users and some random users)
-- [ ] Allow for usage with usernames
+- [X] Allow for usage with usernames
 - [ ] Make a pannel for the extension
 
 
