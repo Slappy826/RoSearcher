@@ -146,9 +146,10 @@ function displayServer(server){
 
 function getUserIdFromName(name){
 	return new Promise((res, rej)=>{
-		fetch(`https://roblox.com/user.aspx?username=${name}`)
+		fetch(`https://www.roblox.com/users/profile?username=${name}`)
 			.then(r => {
 				if(!r.ok) throw 'Invalid response';
+				console.log('hi',r.url);
 				return r.url.match(/\d+/)[0];
 			})
 			.then(id => {
