@@ -149,7 +149,6 @@ function getUserIdFromName(name){
 		fetch(`https://www.roblox.com/users/profile?username=${name}`)
 			.then(r => {
 				if(!r.ok) throw 'Invalid response';
-				console.log('hi',r.url);
 				return r.url.match(/\d+/)[0];
 			})
 			.then(id => {
