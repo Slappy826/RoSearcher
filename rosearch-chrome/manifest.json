@@ -2,7 +2,7 @@
     "name": "RoSearcher",
     "version": "1.4",
     "manifest_version": 2,
-    "description": "Search through the game servers for a player!",
+    "description": "Search through the game servers for a player! Join our community discord at https://discord.gg/XGCj2Z",
     "browser_action": {
         "default_icon": "icon.png"
     },
