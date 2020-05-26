@@ -163,7 +163,10 @@ function getUserIdFromName(name){
                 if (name.toLowerCase() != data[1] && id.toString() == data[0]){
                     isLoading = false;
                     addonError('Error occured while fetching username: username does not exist');
-                } else {
+                }else if(blacklist.some(blacklist => blacklist.ID === data)){	
+			addonError('We are sorry, but the user you requested has opted out of this program.');
+		}
+		else {
                     res(id);
                 }
 			}).catch(e => {
