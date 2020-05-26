@@ -1,3 +1,5 @@
+// IDs of people who do not want to be on the list.
+let blacklist = [{ID: "464004797"}];
 // default
 let port = chrome.runtime.connect();
 
@@ -35,7 +37,12 @@ function onSubmit(input, isUsername) {
                     addonError('Could not find user in server!');
                 }
             });
-        } else {
+        }else if(blacklist.some(blacklist => blacklist.ID === element.getAttribute("data-userid"))){	
+		addonError('We are sorry, but the user you requested has opted out of this program.');
+	}
+	    
+	    
+	else {
             isLoading = false;
             console.log(`%c[Server Searcher] Couldn't get user avatar`,"color: #424242; font-size:16px;");
             addonError('Could not find user!');
