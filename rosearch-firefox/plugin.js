@@ -46,7 +46,7 @@ function onSubmit(input, isUsername) {
             getAvatar(id, cb);
         }).catch(e => {
             isLoading = false;
-            addonError('Error occured while fetching avatar');
+            addonError('Error occurred while fetching avatar');
         });
     } else {
         getAvatar(input, cb);
@@ -152,14 +152,14 @@ function getUserIdFromName(name){
                 let data = getCurrentUser();
                 if (name.toLowerCase() != data[1] && id.toString() == data[0]){
                     isLoading = false;
-                    addonError('Error occured while fetching username: username does not exist');
+                    addonError('Error occurred while fetching username: username does not exist');
                 } else {
                     res(id);
                 }
 			}).catch(e => {
 				console.error(e);
 				isLoading = false;
-				addonError('Error occured while fetching username!');
+				addonError('Error occurred while fetching username!');
 			})
 	});
 }
@@ -175,7 +175,7 @@ function getAvatar(userId, callback){
         .catch(exc => {
             console.error(exc);
             isLoading = false;
-            addonError('Error occured during callback!');
+            addonError('Error occurred during callback!');
         });
 }
 
@@ -220,7 +220,7 @@ function findServer(avatar, userId, callback, startIndex = 0) {
         .catch(ex => {
             console.error(exc);
             isLoading = false;
-            addonError('Error occured during callback!');
+            addonError('Error occurred during callback!');
         });
 }
 
