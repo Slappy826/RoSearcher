@@ -183,11 +183,15 @@ function getAvatar(userId, callback){
 }
 
 function getPlaceId() {
-    //ghetto way of doin it lol
-    var playButton = document.getElementById('MultiplayerVisitButton');
-    if(playButton === null) return addonError('Unable to get place ID!');
+    let playButton = document.getElementById("rbx-private-servers");
+	if(playButton)
+		return playButton.getAttribute("data-placeid");
+	
+	let urlMatch = document.location.href.match(/games\/(\d+)\//);
+	if(urlMatch && !Number.isNaN(Number(urlMatch[1])))
+		return urlMatch[1];
 
-    return playButton.getAttribute('placeid');
+    return addonError('Unable to get place ID!');
 }
 
 function findServer(avatar, userId, callback, startIndex = 0) {
