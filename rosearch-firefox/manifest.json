@@ -3,9 +3,14 @@
     "version": "1.5",
     "manifest_version": 2,
     "description": "Search through the game servers for a player!",
-    "browser_action": {
-        "default_icon": "icon.png"
+    "icons": {
+        "48": "icon.png"
     },
+	"browser_specific_settings": {
+		"gecko": {
+			"id": "rosearcher@slappy826.com"
+		}
+	},
     "permissions": [
         "*://*.roblox.com/*",
         "*://*.rbxcdn.com/*"
