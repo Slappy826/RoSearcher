@@ -365,5 +365,5 @@ function createInput(node){
 
 if(runningGames !== null) {
     console.log("%cServer Searcher has LOADED!","color: #424242; font-size:16px;");
-    createInput(runningGames.firstChild);
+    createInput(runningGames.children[0]);
 }
