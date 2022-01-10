@@ -227,7 +227,7 @@ function findServer(avatar, userId, callback, startIndex = 0) {
         .catch(ex => {
             console.error(exc);
             isLoading = false;
-            addonError('Error occured during callback!');
+            addonError('Error occurred during callback!');
         });
 }
 
